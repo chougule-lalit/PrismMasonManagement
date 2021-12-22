@@ -36,22 +36,30 @@ namespace PrismMasonManagement
             services.AddDbContext<PrismMasonDbContext>(options =>
                 options.UseSqlite(_configuration.GetConnectionString("Default")));
 
-            services.AddAuthentication(options=>{
+            var key = Encoding.ASCII.GetBytes(_configuration["JwtConfig:Secret"]);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                RequireExpirationTime = false
+            };
+
+            services.AddSingleton(tokenValidationParameters);
+
+            services.AddAuthentication(options =>
+            {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(jwt =>{
-                var key = Encoding.ASCII.GetBytes(_configuration["JwtConfig:Secret"]);
+            .AddJwtBearer(jwt =>
+            {
                 jwt.SaveToken = true;
-                jwt.TokenValidationParameters = new TokenValidationParameters{
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    RequireExpirationTime = false
-                };
+                jwt.TokenValidationParameters =tokenValidationParameters;
             });
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)

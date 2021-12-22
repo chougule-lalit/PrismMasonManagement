@@ -7,11 +7,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using PrismMasonManagement.Configuration;
+using PrismMasonManagement.Data;
 using PrismMasonManagement.DTOs.Requests;
 using PrismMasonManagement.DTOs.Responses;
+using PrismMasonManagement.Models;
 
 namespace PrismMasonManagement.Controllers
 {
@@ -20,12 +24,23 @@ namespace PrismMasonManagement.Controllers
     public class AuthManagementController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IOptionsMonitor<JwtConfig> _optionsMonitor;
+        private readonly TokenValidationParameters _tokenValidationParameters;
+        private readonly PrismMasonDbContext _dbContext;
         private readonly JwtConfig _jwtConfig;
 
-        public AuthManagementController(UserManager<IdentityUser> userManager,
-        IOptionsMonitor<JwtConfig> optionsMonitor)
+
+
+        public AuthManagementController(
+            UserManager<IdentityUser> userManager,
+            IOptionsMonitor<JwtConfig> optionsMonitor,
+            TokenValidationParameters tokenValidationParameters,
+            PrismMasonDbContext dbContext)
         {
             _userManager = userManager;
+            _optionsMonitor = optionsMonitor;
+            _tokenValidationParameters = tokenValidationParameters;
+            _dbContext = dbContext;
             _jwtConfig = optionsMonitor.CurrentValue;
         }
 
@@ -57,12 +72,8 @@ namespace PrismMasonManagement.Controllers
                 var isCreated = await _userManager.CreateAsync(newUser, user.Password);
                 if (isCreated.Succeeded)
                 {
-                    var jwtToken = GenerateJwtToken(newUser);
-                    return Ok(new RegistrationResponseDto
-                    {
-                        IsSuccess = true,
-                        Token = jwtToken
-                    });
+                    var jwtToken = await GenerateJwtTokenAsync(newUser);
+                    return Ok(jwtToken);
                 }
                 else
                 {
@@ -107,13 +118,9 @@ namespace PrismMasonManagement.Controllers
                     });
                 }
 
-                var jwtToken = GenerateJwtToken(exisitingUser);
+                var jwtToken = await GenerateJwtTokenAsync(exisitingUser);
 
-                return Ok(new RegistrationResponseDto
-                {
-                    IsSuccess = true,
-                    Token = jwtToken
-                });
+                return Ok(jwtToken);
             }
 
             return BadRequest(new RegistrationResponseDto()
@@ -122,8 +129,136 @@ namespace PrismMasonManagement.Controllers
                 IsSuccess = false
             });
         }
+
+
+        [HttpPost]
+        [Route("RefreshToken")]
+        public async Task<IActionResult> RefreshTokenAsync([FromBody] TokenRequestDto tokenRequest)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await VerifyAndGenerateTokenAsync(tokenRequest);
+
+                if (result == null)
+                {
+                    return BadRequest(new RegistrationResponseDto
+                    {
+                        Errors = new List<string> { "Invalid tokens" },
+                        IsSuccess = false
+                    });
+                }
+
+                return Ok(result);
+            }
+
+            return BadRequest(new RegistrationResponseDto
+            {
+                Errors = new List<string> { "Invalid payload" },
+                IsSuccess = false
+            });
+        }
+
+        private async Task<AuthResult> VerifyAndGenerateTokenAsync(TokenRequestDto tokenRequest)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                //Validation 1 - Validate JWT token format
+                var tokenInVerification = jwtTokenHandler.ValidateToken(tokenRequest.Token, _tokenValidationParameters, out var validatedToken);
+
+                //Validation 2 - Validate encryption alg
+                if (validatedToken is JwtSecurityToken jwtSecurityToken)
+                {
+                    var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
+
+                    if (!result)
+                    {
+                        return null;
+                    }
+                }
+
+                //Validation 3 - Validate expiry date
+                var utcExpiryDate = long.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+
+                var expiryDate = UnixTimeStampToDateTime(utcExpiryDate);
+                Console.WriteLine(expiryDate);
+                var checkAgainstDate = DateTime.UtcNow.ToLocalTime();
+                Console.WriteLine(checkAgainstDate);
+                if (expiryDate > checkAgainstDate)
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Errors = new List<string> { "Token has not yet expired" }
+                    };
+                }
+
+                //Validation 4 - validate if token exist in db
+                var storedToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.Token == tokenRequest.RefreshToken);
+                if (storedToken == null)
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Errors = new List<string> { "Token does not exist" }
+                    };
+                }
+
+                //Validation 5 -- validate if used or not
+                if (storedToken.IsUsed)
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Errors = new List<string> { "Token has been used" }
+                    };
+                }
+
+                //Validation 6 -- validate if revoked or not
+                if (storedToken.IsRevoked)
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Errors = new List<string> { "Token has been revoked" }
+                    };
+                }
+
+                //Validation 7 -- validate id
+                var jti = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+                if (storedToken.JwtId != jti)
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Errors = new List<string> { "Token doesn't match" }
+                    };
+                }
+
+                //Update current token
+                storedToken.IsUsed = true;
+                _dbContext.RefreshTokens.Update(storedToken);
+                await _dbContext.SaveChangesAsync();
+
+                //Generate new token
+                var dbUser = await _userManager.FindByIdAsync(storedToken.UserId);
+                return await GenerateJwtTokenAsync(dbUser);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(JsonConvert.SerializeObject(ex, Formatting.Indented));
+            }
+        }
+
+        private DateTime UnixTimeStampToDateTime(long unixTimeStamp)
+        {
+            var dateTimeValue = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dateTimeValue = dateTimeValue.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dateTimeValue;
+        }
+
         #region  JWT TOKEN  
-        private string GenerateJwtToken(IdentityUser user)
+        private async Task<AuthResult> GenerateJwtTokenAsync(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
@@ -135,14 +270,41 @@ namespace PrismMasonManagement.Controllers
                     new Claim(JwtRegisteredClaimNames.Sub,user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(6),
+                Expires = DateTime.UtcNow.AddSeconds(30),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = jwtTokenHandler.WriteToken(token);
 
-            return jwtToken;
+            var refreshToken = new RefreshToken()
+            {
+                JwtId = token.Id,
+                IsUsed = false,
+                IsRevoked = false,
+                UserId = user.Id,
+                CreationDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddMonths(6),
+                Token = RandomString(35) + Guid.NewGuid()
+            };
+
+            await _dbContext.RefreshTokens.AddAsync(refreshToken);
+            await _dbContext.SaveChangesAsync();
+
+            return new AuthResult
+            {
+                Token = jwtToken,
+                IsSuccess = true,
+                RefreshToken = refreshToken.Token
+            };
+        }
+
+        private string RandomString(int length)
+        {
+            var random = new Random();
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(x => x[random.Next(x.Length)]).ToArray());
         }
         #endregion
     }
