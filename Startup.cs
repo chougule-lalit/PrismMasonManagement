@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PrismMasonManagement.Authorization.Permission;
 using PrismMasonManagement.Configuration;
 using PrismMasonManagement.Data;
 
@@ -64,8 +66,14 @@ namespace PrismMasonManagement
                 jwt.TokenValidationParameters = tokenValidationParameters;
             });
 
+            //Permission Management code
+            services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+            services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                        .AddRoles<IdentityRole>()
                         .AddEntityFrameworkStores<PrismMasonDbContext>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
