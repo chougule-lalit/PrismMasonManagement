@@ -33,7 +33,7 @@ namespace PrismMasonManagement.Controllers
             var viewModel = new List<UserRolesDto>();
             var user = await _userManager.FindByIdAsync(userId);
             var roles = await _roleManager.Roles.ToListAsync();
-            foreach (var roleName in roles.Select(x=> x.Name))
+            foreach (var roleName in roles.Select(x => x.Name))
             {
                 var userRolesViewModel = new UserRolesDto
                 {
@@ -58,18 +58,19 @@ namespace PrismMasonManagement.Controllers
         }
 
         [HttpPost]
-        [Route("Update/{id}")]
-        public async Task<IActionResult> Update(string id, ManageUserRolesDto model)
+        [Route("Update")]
+        public async Task<IActionResult> Update(ManageUserRolesDto model)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(model.UserId);
             var roles = await _userManager.GetRolesAsync(user);
             //Exception handling should be implemented here
-            var result = await _userManager.RemoveFromRolesAsync(user, roles);            
+            var result = await _userManager.RemoveFromRolesAsync(user, roles);
             result = await _userManager.AddToRolesAsync(user, model.UserRoles.Where(x => x.Selected).Select(y => y.RoleName));
             var currentUser = await _userManager.GetUserAsync(User);
-            await _signInManager.RefreshSignInAsync(currentUser);
+            if (currentUser != null)
+                await _signInManager.RefreshSignInAsync(currentUser);
             await PrismMasonUserSeeder.SeedSuperAdminAsync(_userManager, _roleManager);
-            return RedirectToAction("Index", new { userId = id });
+            return Ok(true);
         }
     }
 }
