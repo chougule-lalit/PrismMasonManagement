@@ -33,8 +33,10 @@ namespace PrismMasonManagement
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JwtConfig>(_configuration.GetSection("JwtConfig"));
+            //services.AddDbContext<PrismMasonDbContext>(options =>
+            //    options.UseSqlite(_configuration.GetConnectionString("Default")));
             services.AddDbContext<PrismMasonDbContext>(options =>
-                options.UseSqlite(_configuration.GetConnectionString("Default")));
+                options.UseNpgsql(_configuration.GetConnectionString("PostgreSQL")));
 
             var key = Encoding.ASCII.GetBytes(_configuration["JwtConfig:Secret"]);
 
@@ -59,7 +61,7 @@ namespace PrismMasonManagement
             .AddJwtBearer(jwt =>
             {
                 jwt.SaveToken = true;
-                jwt.TokenValidationParameters =tokenValidationParameters;
+                jwt.TokenValidationParameters = tokenValidationParameters;
             });
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -68,6 +70,26 @@ namespace PrismMasonManagement
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PrismMasonManagement", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert JWT with Bearer into field",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
             });
         }
 

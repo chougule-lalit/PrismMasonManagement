@@ -20,6 +20,7 @@ namespace PrismMasonManagement.Controllers
 
         }
 
+        [HttpGet]
         [Route("getItems")]
         public async Task<IActionResult> GetItemAsync()
         {
