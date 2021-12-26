@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using PrismMasonManagement.DTOs.Permission;
+using PrismMasonManagement.Api.DTOs.Permission;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Authorization
+namespace PrismMasonManagement.Api.Authorization
 {
     public static class ClaimsHelper
     {

@@ -12,11 +12,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using PrismMasonManagement.Configuration;
-using PrismMasonManagement.Data;
-using PrismMasonManagement.DTOs.Requests;
-using PrismMasonManagement.DTOs.Responses;
-using PrismMasonManagement.Models;
+using PrismMasonManagement.Api.Configuration;
+using PrismMasonManagement.Api.DTOs.Requests;
+using PrismMasonManagement.Api.DTOs.Responses;
+using PrismMasonManagement.Core.Entities;
+using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Controllers
 {

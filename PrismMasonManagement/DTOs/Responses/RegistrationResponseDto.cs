@@ -1,6 +1,6 @@
-using PrismMasonManagement.Configuration;
+using PrismMasonManagement.Api.Configuration;
 
-namespace PrismMasonManagement.DTOs.Responses
+namespace PrismMasonManagement.Api.DTOs.Responses
 {
     public class RegistrationResponseDto : AuthResult
     {

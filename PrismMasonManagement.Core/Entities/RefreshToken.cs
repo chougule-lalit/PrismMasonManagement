@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
-namespace PrismMasonManagement.Models
+namespace PrismMasonManagement.Core.Entities
 {
     public class RefreshToken
     {

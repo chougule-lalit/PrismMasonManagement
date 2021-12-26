@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PrismMasonManagement.DTOs.Requests
+namespace PrismMasonManagement.Api.DTOs.Requests
 {
     public class UserLoginRequestDto
     {

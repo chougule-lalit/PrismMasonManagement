@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PrismMasonManagement.Data;
-using PrismMasonManagement.Models;
+using PrismMasonManagement.Infrastructure;
 
-namespace PrismMasonManagement.Controllers
+namespace PrismMasonManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PrismMasonManagement.Configuration
+namespace PrismMasonManagement.Api.Configuration
 {
     public class AuthResult
     {

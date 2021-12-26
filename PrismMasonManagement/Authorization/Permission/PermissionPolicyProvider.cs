@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Authorization.Permission
+namespace PrismMasonManagement.Api.Authorization.Permission
 {
     public class PermissionPolicyProvider : IAuthorizationPolicyProvider
     {

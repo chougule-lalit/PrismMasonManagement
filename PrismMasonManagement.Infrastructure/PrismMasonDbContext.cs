@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using PrismMasonManagement.Models;
+using PrismMasonManagement.Core.Entities;
 
-namespace PrismMasonManagement.Data
+namespace PrismMasonManagement.Infrastructure
 {
     public class PrismMasonDbContext : IdentityDbContext
     {

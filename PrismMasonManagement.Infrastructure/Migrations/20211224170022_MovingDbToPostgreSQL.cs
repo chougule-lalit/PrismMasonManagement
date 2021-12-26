@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace PrismMasonManagement.Data.Migrations
+namespace PrismMasonManagement.Infrastructure.Migrations
 {
     public partial class MovingDbToPostgreSQL : Migration
     {

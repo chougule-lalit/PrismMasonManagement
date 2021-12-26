@@ -1,4 +1,4 @@
-namespace PrismMasonManagement.Models
+namespace PrismMasonManagement.Core.Entities
 {
     public class Item
     {

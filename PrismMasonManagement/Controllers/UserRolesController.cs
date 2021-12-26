@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PrismMasonManagement.DTOs.Permission;
-using PrismMasonManagement.Seeding;
-using System;
+using PrismMasonManagement.Api.DTOs.Permission;
+using PrismMasonManagement.Api.Seeding;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Controllers
+namespace PrismMasonManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

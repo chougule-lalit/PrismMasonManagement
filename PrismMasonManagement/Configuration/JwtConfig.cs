@@ -1,4 +1,4 @@
-namespace PrismMasonManagement.Configuration
+namespace PrismMasonManagement.Api.Configuration
 {
     public class JwtConfig
     {

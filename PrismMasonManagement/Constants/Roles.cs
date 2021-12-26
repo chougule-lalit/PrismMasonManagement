@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Constants
+namespace PrismMasonManagement.Api.Constants
 {
     public enum Roles
     {

@@ -17,11 +17,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PrismMasonManagement.Authorization.Permission;
-using PrismMasonManagement.Configuration;
-using PrismMasonManagement.Data;
+using PrismMasonManagement.Api.Authorization.Permission;
+using PrismMasonManagement.Api.Configuration;
+using PrismMasonManagement.Infrastructure;
 
-namespace PrismMasonManagement
+namespace PrismMasonManagement.Api
 {
     public class Startup
     {
