@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using PrismMasonManagement.Api.Authorization;
-using PrismMasonManagement.Api.Constants;
+using PrismMasonManagement.Application.Authorization;
+using PrismMasonManagement.Core.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Api.Seeding
+namespace PrismMasonManagement.Application.Seeding
 {
     public static class PrismMasonUserSeeder
     {

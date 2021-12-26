@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Api.Authorization.Permission
+namespace PrismMasonManagement.Application.Authorization.Permission
 {
     public class PermissionRequirement : IAuthorizationRequirement
     {

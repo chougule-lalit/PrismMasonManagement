@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PrismMasonManagement.Api.Authorization;
-using PrismMasonManagement.Api.DTOs.Permission;
+using PrismMasonManagement.Application.Authorization;
+using PrismMasonManagement.Application.Contracts.DTOs.Permission;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

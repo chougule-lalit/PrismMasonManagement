@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Api.Authorization
+namespace PrismMasonManagement.Application.Authorization
 {
     public static class Permissions
     {

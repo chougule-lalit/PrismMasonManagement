@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PrismMasonManagement.Api.DTOs.Permission;
-using PrismMasonManagement.Api.Seeding;
+using PrismMasonManagement.Application.Contracts.DTOs.Permission;
+using PrismMasonManagement.Application.Seeding;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

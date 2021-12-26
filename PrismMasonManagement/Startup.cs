@@ -17,8 +17,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PrismMasonManagement.Api.Authorization.Permission;
-using PrismMasonManagement.Api.Configuration;
+using PrismMasonManagement.Application.Authorization.Permission;
+using PrismMasonManagement.Application.Contracts.Configuration;
 using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Api

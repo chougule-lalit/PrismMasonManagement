@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using PrismMasonManagement.Api.Constants;
+using PrismMasonManagement.Core.Constants;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Api.Seeding
+namespace PrismMasonManagement.Application.Seeding
 {
     public static class PrismMasonRoleSeeder
     {

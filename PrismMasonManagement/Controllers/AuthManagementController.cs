@@ -12,9 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using PrismMasonManagement.Api.Configuration;
-using PrismMasonManagement.Api.DTOs.Requests;
-using PrismMasonManagement.Api.DTOs.Responses;
+using PrismMasonManagement.Application.Contracts.Configuration;
+using PrismMasonManagement.Application.Contracts.DTOs.Requests;
+using PrismMasonManagement.Application.Contracts.DTOs.Responses;
 using PrismMasonManagement.Core.Entities;
 using PrismMasonManagement.Infrastructure;
 
