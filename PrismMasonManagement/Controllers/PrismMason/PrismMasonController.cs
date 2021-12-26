@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrismMasonManagement.Infrastructure;
 
-namespace PrismMasonManagement.Api.Controllers
+namespace PrismMasonManagement.Api.Controllers.PrismMason
 {
     [Route("api/[controller]")]
     [ApiController]

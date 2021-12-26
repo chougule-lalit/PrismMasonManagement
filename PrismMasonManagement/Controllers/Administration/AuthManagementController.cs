@@ -18,7 +18,7 @@ using PrismMasonManagement.Application.Contracts.DTOs.Responses;
 using PrismMasonManagement.Core.Entities;
 using PrismMasonManagement.Infrastructure;
 
-namespace PrismMasonManagement.Controllers
+namespace PrismMasonManagement.Api.Controllers.Administration
 {
     [Route("api/[controller]")] //api/authManagement
     [ApiController]

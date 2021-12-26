@@ -1,37 +1,34 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PrismMasonManagement.Application.Contracts.Authorization.Interfaces;
 using PrismMasonManagement.Application.Contracts.DTOs.Permission;
 using PrismMasonManagement.Application.Seeding;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Api.Controllers
+namespace PrismMasonManagement.Application.Authorization.Services
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    //[Authorize(Roles = "SuperAdmin")]
-    public class UserRolesController : ControllerBase
+    public class UserRoleAppService : IUserRoleAppService
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public UserRolesController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager)
+        public UserRoleAppService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
         }
 
-        [HttpGet]
-        [Route("GetUserRoles")]
-        public async Task<IActionResult> GetUserRolesDto(string userId)
+        public async virtual Task<ManageUserRolesDto> GetUserRoleAsync(string userId)
         {
-            var viewModel = new List<UserRolesDto>();
+            var userRoles = new List<UserRolesDto>();
             var user = await _userManager.FindByIdAsync(userId);
             var roles = await _roleManager.Roles.ToListAsync();
-            foreach (var roleName in roles.Select(x=> x.Name))
+            foreach (var roleName in roles.Select(x => x.Name))
             {
                 var userRolesViewModel = new UserRolesDto
                 {
@@ -45,29 +42,33 @@ namespace PrismMasonManagement.Api.Controllers
                 {
                     userRolesViewModel.Selected = false;
                 }
-                viewModel.Add(userRolesViewModel);
+                userRoles.Add(userRolesViewModel);
             }
-            var model = new ManageUserRolesDto()
+            var userRolesDetails = new ManageUserRolesDto()
             {
                 UserId = userId,
-                UserRoles = viewModel
+                UserRoles = userRoles
             };
-            return Ok(model);
+
+            return userRolesDetails;
         }
 
-        [HttpPost]
-        [Route("Update/{id}")]
-        public async Task<IActionResult> Update(string id, ManageUserRolesDto model)
+        public async virtual Task<bool> Update(ManageUserRolesDto model)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(model.UserId);
             var roles = await _userManager.GetRolesAsync(user);
-            //Exception handling should be implemented here
-            var result = await _userManager.RemoveFromRolesAsync(user, roles);            
+
+            var result = await _userManager.RemoveFromRolesAsync(user, roles);
+            if (!result.Succeeded)
+                return false;
             result = await _userManager.AddToRolesAsync(user, model.UserRoles.Where(x => x.Selected).Select(y => y.RoleName));
-            var currentUser = await _userManager.GetUserAsync(User);
-            await _signInManager.RefreshSignInAsync(currentUser);
+
+            if (!result.Succeeded)
+                return false;
+
+            await _signInManager.RefreshSignInAsync(user);
             await PrismMasonUserSeeder.SeedSuperAdminAsync(_userManager, _roleManager);
-            return RedirectToAction("Index", new { userId = id });
+            return true;
         }
     }
 }

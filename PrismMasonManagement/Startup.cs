@@ -66,6 +66,9 @@ namespace PrismMasonManagement.Api
                 jwt.TokenValidationParameters = tokenValidationParameters;
             });
 
+            //DI of PrismMasonManagement
+            services.AddPrismMasonDependencies();
+
             //Permission Management code
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

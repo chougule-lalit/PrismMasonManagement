@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Api.Controllers
+namespace PrismMasonManagement.Api.Controllers.Administration
 {
     [Route("api/[controller]")]
     [ApiController]
