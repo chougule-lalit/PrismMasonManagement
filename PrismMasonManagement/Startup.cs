@@ -35,10 +35,10 @@ namespace PrismMasonManagement.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JwtConfig>(_configuration.GetSection("JwtConfig"));
-            //services.AddDbContext<PrismMasonDbContext>(options =>
-            //    options.UseSqlite(_configuration.GetConnectionString("Default")));
             services.AddDbContext<PrismMasonDbContext>(options =>
-                options.UseNpgsql(_configuration.GetConnectionString("PostgreSQL")));
+                options.UseSqlite(_configuration.GetConnectionString("Default")));
+            //services.AddDbContext<PrismMasonDbContext>(options =>
+            //    options.UseNpgsql(_configuration.GetConnectionString("PostgreSQL")));
 
             var key = Encoding.ASCII.GetBytes(_configuration["JwtConfig:Secret"]);
 
@@ -78,6 +78,17 @@ namespace PrismMasonManagement.Api
                         .AddEntityFrameworkStores<PrismMasonDbContext>();
 
             services.AddControllers();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+                });
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PrismMasonManagement", Version = "v1" });
@@ -110,13 +121,16 @@ namespace PrismMasonManagement.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PrismMasonManagement v1"));
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PrismMasonManagement v1"));
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("EnableCORS");
 
             app.UseAuthentication();
 
