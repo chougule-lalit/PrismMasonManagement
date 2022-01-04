@@ -9,7 +9,7 @@ using PrismMasonManagement.Infrastructure;
 namespace PrismMasonManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(PrismMasonDbContext))]
-    [Migration("20220101113437_InitialCreate")]
+    [Migration("20220103171818_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
