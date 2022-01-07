@@ -21,6 +21,7 @@ namespace PrismMasonManagement.Api.Controllers.PrismMason
 
         [HttpGet]
         [Route("getItems")]
+        [Authorize(Policy = "Permissions.Items.View")]
         public async Task<IActionResult> GetItemAsync()
         {
             var items = await _context.Items.ToListAsync();

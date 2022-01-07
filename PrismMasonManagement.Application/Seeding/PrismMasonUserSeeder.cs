@@ -58,12 +58,15 @@ namespace PrismMasonManagement.Application.Seeding
         public static async Task AddPermissionClaim(this RoleManager<IdentityRole> roleManager, IdentityRole role, string module)
         {
             var allClaims = await roleManager.GetClaimsAsync(role);
-            var allPermissions = Permissions.GeneratePermissionsForModule(module);
-            foreach (var permission in allPermissions)
+            if (allClaims.Count == 0)
             {
-                if (!allClaims.Any(a => a.Type == "Permission" && a.Value == permission))
+                var allPermissions = Permissions.GeneratePermissionsForModule(module);
+                foreach (var permission in allPermissions)
                 {
-                    await roleManager.AddClaimAsync(role, new Claim("Permission", permission));
+                    if (!allClaims.Any(a => a.Type == "Permission" && a.Value == permission))
+                    {
+                        await roleManager.AddClaimAsync(role, new Claim("Permission", permission));
+                    }
                 }
             }
         }

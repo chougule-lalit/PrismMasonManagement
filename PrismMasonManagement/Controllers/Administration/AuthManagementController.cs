@@ -12,7 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using PrismMasonManagement.Application.Authorization;
 using PrismMasonManagement.Application.Contracts.Configuration;
+using PrismMasonManagement.Application.Contracts.DTOs.Permission;
 using PrismMasonManagement.Application.Contracts.DTOs.Requests;
 using PrismMasonManagement.Application.Contracts.DTOs.Responses;
 using PrismMasonManagement.Core.Entities;
@@ -26,6 +28,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
     public class AuthManagementController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IOptionsMonitor<JwtConfig> _optionsMonitor;
         private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly PrismMasonDbContext _dbContext;
@@ -35,11 +38,13 @@ namespace PrismMasonManagement.Api.Controllers.Administration
 
         public AuthManagementController(
             UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             IOptionsMonitor<JwtConfig> optionsMonitor,
             TokenValidationParameters tokenValidationParameters,
             PrismMasonDbContext dbContext)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _optionsMonitor = optionsMonitor;
             _tokenValidationParameters = tokenValidationParameters;
             _dbContext = dbContext;
@@ -260,18 +265,63 @@ namespace PrismMasonManagement.Api.Controllers.Administration
         }
 
         #region  JWT TOKEN  
+
+        private async Task<List<Claim>> GetValidClaimsAsync(IdentityUser user)
+        {
+            IdentityOptions _options = new IdentityOptions();
+            var claims = new List<Claim>
+            {
+                new Claim("Id", user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(_options.ClaimsIdentity.UserIdClaimType, user.Id.ToString()),
+                new Claim(_options.ClaimsIdentity.UserNameClaimType, user.UserName),
+            };
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            claims.AddRange(userClaims);
+
+            List<Claim> finalClaimsToAdd = new List<Claim>();
+            foreach (var roleName in userRoles)
+            {
+                var roleDetail = await _roleManager.FindByNameAsync(roleName);
+                if(roleDetail != null)
+                {
+                    var allPermissions = new List<RoleClaimsDto>();
+                    allPermissions.GetPermissions(typeof(Permissions.Items), roleDetail.Id);
+                    var role = await _roleManager.FindByIdAsync(roleDetail.Id);
+
+                    var roleClaims = await _roleManager.GetClaimsAsync(role);
+                    var allClaimValues = allPermissions.Select(a => a.Value).ToList();
+                    var roleClaimValues = roleClaims.Select(a => a.Value).ToList();
+                    var authorizedClaims = allClaimValues.Intersect(roleClaimValues).ToList();
+                    foreach (var permission in allPermissions)
+                    {
+                        if (authorizedClaims.Any(a => a == permission.Value))
+                        {
+                            permission.Selected = true;
+                        }
+                    }
+                    var finalClaimsToLookFor = allPermissions.Where(x => x.Selected).Select(x => x.Value).ToList();
+                    var finalClaims = roleClaims.Where(x => finalClaimsToLookFor.Contains(x.Value)).ToList();
+                    finalClaimsToAdd.AddRange(finalClaims);
+                }
+            }
+            claims.AddRange(finalClaimsToAdd);
+            return claims;
+        }
+
         private async Task<AuthResult> GenerateJwtTokenAsync(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+            var claims = await GetValidClaimsAsync(user);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]{
-                    new Claim("Id",user.Id),
-                    new Claim(JwtRegisteredClaimNames.Email,user.Email),
-                    new Claim(JwtRegisteredClaimNames.Sub,user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
