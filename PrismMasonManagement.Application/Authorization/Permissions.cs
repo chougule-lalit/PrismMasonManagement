@@ -10,13 +10,23 @@ namespace PrismMasonManagement.Application.Authorization
         public static List<string> GeneratePermissionsForModule(string module)
         {
             return new List<string>()
-        {
-            $"Permissions.{module}.Create",
-            $"Permissions.{module}.View",
-            $"Permissions.{module}.Edit",
-            $"Permissions.{module}.Delete",
-        };
+            {
+                $"Permissions.{module}.Create",
+                $"Permissions.{module}.View",
+                $"Permissions.{module}.Edit",
+                $"Permissions.{module}.Delete",
+            };
         }
+
+        public static List<Type> GetAllPermissionTypes()
+        {
+            return new List<Type>
+                    {
+                        typeof(Items),
+                        typeof(Products)
+                    };
+        }
+
         public static class Items
         {
             public const string View = "Permissions.Items.View";

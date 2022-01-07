@@ -11,9 +11,14 @@ namespace PrismMasonManagement.Application.Authorization
 {
     public static class ClaimsHelper
     {
-        public static void GetPermissions(this List<RoleClaimsDto> allPermissions, Type policy, string roleId)
+        public static void GetPermissions(this List<RoleClaimsDto> allPermissions, List<Type> policies, string roleId)
         {
-            FieldInfo[] fields = policy.GetFields(BindingFlags.Static | BindingFlags.Public);
+            List<FieldInfo> fields = new List<FieldInfo>();
+                foreach (var policy in policies)
+            {
+                fields.AddRange(policy.GetFields(BindingFlags.Static | BindingFlags.Public));
+            }
+                
             foreach (FieldInfo fi in fields)
             {
                 allPermissions.Add(new RoleClaimsDto { Value = fi.GetValue(null).ToString(), Type = "Permissions" });

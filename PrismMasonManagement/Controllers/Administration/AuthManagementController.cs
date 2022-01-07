@@ -280,37 +280,8 @@ namespace PrismMasonManagement.Api.Controllers.Administration
             };
 
             var userClaims = await _userManager.GetClaimsAsync(user);
-            var userRoles = await _userManager.GetRolesAsync(user);
 
             claims.AddRange(userClaims);
-
-            List<Claim> finalClaimsToAdd = new List<Claim>();
-            foreach (var roleName in userRoles)
-            {
-                var roleDetail = await _roleManager.FindByNameAsync(roleName);
-                if(roleDetail != null)
-                {
-                    var allPermissions = new List<RoleClaimsDto>();
-                    allPermissions.GetPermissions(typeof(Permissions.Items), roleDetail.Id);
-                    var role = await _roleManager.FindByIdAsync(roleDetail.Id);
-
-                    var roleClaims = await _roleManager.GetClaimsAsync(role);
-                    var allClaimValues = allPermissions.Select(a => a.Value).ToList();
-                    var roleClaimValues = roleClaims.Select(a => a.Value).ToList();
-                    var authorizedClaims = allClaimValues.Intersect(roleClaimValues).ToList();
-                    foreach (var permission in allPermissions)
-                    {
-                        if (authorizedClaims.Any(a => a == permission.Value))
-                        {
-                            permission.Selected = true;
-                        }
-                    }
-                    var finalClaimsToLookFor = allPermissions.Where(x => x.Selected).Select(x => x.Value).ToList();
-                    var finalClaims = roleClaims.Where(x => finalClaimsToLookFor.Contains(x.Value)).ToList();
-                    finalClaimsToAdd.AddRange(finalClaims);
-                }
-            }
-            claims.AddRange(finalClaimsToAdd);
             return claims;
         }
 

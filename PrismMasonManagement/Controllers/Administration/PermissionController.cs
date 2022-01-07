@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PrismMasonManagement.Application.Authorization;
 using PrismMasonManagement.Application.Contracts.DTOs.Permission;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
         {
             var model = new PermissionDto();
             var allPermissions = new List<RoleClaimsDto>();
-            allPermissions.GetPermissions(typeof(Permissions.Items), roleId);
+            allPermissions.GetPermissions(Permissions.GetAllPermissionTypes(), roleId);
             var role = await _roleManager.FindByIdAsync(roleId);
             model.RoleId = roleId;
             var claims = await _roleManager.GetClaimsAsync(role);
