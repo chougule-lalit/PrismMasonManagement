@@ -3,7 +3,7 @@
 	"author": "Lalit D Chougule",
 	"classifications": [ ".Net Core Web API" ],
 	"identity": "lalit.ddd.basic.architecture.net.core.web.api.01",
-	"name": "lalit.web.api.01",
+	"name": "DDD-Architecture-Web-Api",
 	"shortName": "ddd-web-api",
 	"tags": {
 		"type": "project",

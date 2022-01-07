@@ -13,6 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrismMasonManagement.Applic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrismMasonManagement.Application.Contracts", "PrismMasonManagement.Application.Contract\PrismMasonManagement.Application.Contracts.csproj", "{0B146E66-F867-4264-8B20-3E3BB66B8359}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "template files", "template files", "{18C10931-9E0C-4D66-AA74-639D37BBC8C4}"
+	ProjectSection(SolutionItems) = preProject
+		DDD-Architecture-Web-API-01.nuspec = DDD-Architecture-Web-API-01.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
