@@ -1,9 +1,9 @@
+using PrismMasonManagement.Core.PrismMasonManagementCoreBase;
+
 namespace PrismMasonManagement.Core.Entities
 {
-    public class Item
+    public class Item : FullAuditedEntity<int>
     {
-        public int Id { get; set; }
-
         public string Name { get; set; }
     }
 }

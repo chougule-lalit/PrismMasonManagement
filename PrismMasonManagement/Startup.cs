@@ -67,11 +67,14 @@ namespace PrismMasonManagement.Api
             });
 
             //DI of PrismMasonManagement
-            services.AddPrismMasonDependencies();
+            services.AddPrismMasonManagementDependencies();
 
             //Permission Management code
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+            ////Automappers
+            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                         .AddRoles<IdentityRole>()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PrismMasonManagement.Application.Authorization.Services;
 using PrismMasonManagement.Application.Contracts.Authorization.Interfaces;
+using PrismMasonManagement.Infrastructure.PrismMasonManagementDomainService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,10 @@ namespace PrismMasonManagement.Api
 {
     public static class PrismMasonManagementDIHandler
     {
-        public static void AddPrismMasonDependencies(this IServiceCollection services)
+        public static void AddPrismMasonManagementDependencies(this IServiceCollection services)
         {
-            services.AddScoped<IUserRoleAppService, UserRoleAppService>();
+            services.AddTransient<IUserRoleAppService, UserRoleAppService>();
+            services.AddTransient<ICurrentUser, CurrentUser>();
         }
     }
 }

@@ -2,17 +2,15 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(PrismMasonManagementDbContext))]
-    [Migration("20220103171818_InitialCreate")]
-    partial class InitialCreate
+    partial class PrismMasonManagementDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,6 +217,18 @@ namespace PrismMasonManagement.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CreationTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
