@@ -31,7 +31,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IOptionsMonitor<JwtConfig> _optionsMonitor;
         private readonly TokenValidationParameters _tokenValidationParameters;
-        private readonly PrismMasonDbContext _dbContext;
+        private readonly PrismMasonManagementDbContext _dbContext;
         private readonly JwtConfig _jwtConfig;
 
 
@@ -41,7 +41,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
             RoleManager<IdentityRole> roleManager,
             IOptionsMonitor<JwtConfig> optionsMonitor,
             TokenValidationParameters tokenValidationParameters,
-            PrismMasonDbContext dbContext)
+            PrismMasonManagementDbContext dbContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;

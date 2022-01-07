@@ -12,8 +12,8 @@ namespace PrismMasonManagement.Api.Controllers.PrismMason
     [Authorize]
     public class PrismMasonController : ControllerBase
     {
-        private readonly PrismMasonDbContext _context;
-        public PrismMasonController(PrismMasonDbContext context)
+        private readonly PrismMasonManagementDbContext _context;
+        public PrismMasonController(PrismMasonManagementDbContext context)
         {
             _context = context;
 

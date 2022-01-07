@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrismMasonManagement.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrismMasonManagement.Infrastructure", "PrismMasonManagement.Infrastructure\PrismMasonManagement.Infrastructure.csproj", "{93630F30-915D-4397-9D70-4C4ADF84E8E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrismMasonManagement.Application", "PrismMasonManagement.Application\PrismMasonManagement.Application.csproj", "{ADFBB54B-CE4F-4DD7-9374-C29D3C6249FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrismMasonManagement.Application", "PrismMasonManagement.Application\PrismMasonManagement.Application.csproj", "{ADFBB54B-CE4F-4DD7-9374-C29D3C6249FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrismMasonManagement.Application.Contracts", "PrismMasonManagement.Application.Contract\PrismMasonManagement.Application.Contracts.csproj", "{0B146E66-F867-4264-8B20-3E3BB66B8359}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrismMasonManagement.Application.Contracts", "PrismMasonManagement.Application.Contract\PrismMasonManagement.Application.Contracts.csproj", "{0B146E66-F867-4264-8B20-3E3BB66B8359}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

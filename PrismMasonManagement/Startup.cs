@@ -35,7 +35,7 @@ namespace PrismMasonManagement.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JwtConfig>(_configuration.GetSection("JwtConfig"));
-            services.AddDbContext<PrismMasonDbContext>(options =>
+            services.AddDbContext<PrismMasonManagementDbContext>(options =>
                 options.UseSqlite(_configuration.GetConnectionString("Default")));
             //services.AddDbContext<PrismMasonDbContext>(options =>
             //    options.UseNpgsql(_configuration.GetConnectionString("PostgreSQL")));
@@ -75,7 +75,7 @@ namespace PrismMasonManagement.Api
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                         .AddRoles<IdentityRole>()
-                        .AddEntityFrameworkStores<PrismMasonDbContext>();
+                        .AddEntityFrameworkStores<PrismMasonManagementDbContext>();
 
             services.AddControllers();
 

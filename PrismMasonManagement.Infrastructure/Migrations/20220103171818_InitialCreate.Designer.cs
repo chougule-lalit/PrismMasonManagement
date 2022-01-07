@@ -8,7 +8,7 @@ using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Infrastructure.Migrations
 {
-    [DbContext(typeof(PrismMasonDbContext))]
+    [DbContext(typeof(PrismMasonManagementDbContext))]
     [Migration("20220103171818_InitialCreate")]
     partial class InitialCreate
     {

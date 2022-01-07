@@ -7,7 +7,7 @@ using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Infrastructure.Migrations
 {
-    [DbContext(typeof(PrismMasonDbContext))]
+    [DbContext(typeof(PrismMasonManagementDbContext))]
     partial class PrismMasonDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
