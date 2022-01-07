@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PrismMasonManagement.Core.Entities;
 using PrismMasonManagement.Core.PrismMasonManagementCoreBase;
+using PrismMasonManagement.Infrastructure.PrismMasonManagementDomainService;
 using System;
 using System.Linq;
 using System.Threading;

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrismMasonManagement.Application.Authorization;
+using PrismMasonManagement.Application.Contracts.PrismMasonManagementDTOs;
 using PrismMasonManagement.Core.Entities;
 using PrismMasonManagement.Infrastructure;
 
@@ -15,9 +16,13 @@ namespace PrismMasonManagement.Api.Controllers.PrismMason
     public class PrismMasonController : ControllerBase
     {
         private readonly PrismMasonManagementDbContext _context;
-        public PrismMasonController(PrismMasonManagementDbContext context)
+        private readonly IItemAppService _itemAppService;
+
+        public PrismMasonController(PrismMasonManagementDbContext context,
+            IItemAppService itemAppService)
         {
             _context = context;
+            _itemAppService = itemAppService;
 
         }
 
@@ -26,7 +31,7 @@ namespace PrismMasonManagement.Api.Controllers.PrismMason
         [Authorize(Policy = Permissions.Items.View)]
         public async Task<IActionResult> GetItemAsync()
         {
-            var items = await _context.Items.ToListAsync();
+            var items = await _itemAppService.GetAllItemsAync();
             return Ok(items);
         }
 
@@ -64,6 +69,14 @@ namespace PrismMasonManagement.Api.Controllers.PrismMason
             }
 
             return Ok(false);
+        }
+
+        [HttpDelete]
+        [Route("delete")]
+        [Authorize(Policy = Permissions.Items.Delete)]
+        public async Task DeleteAsync(int id)
+        {
+            await _itemAppService.DeleteAsync(id);
         }
     }
 }

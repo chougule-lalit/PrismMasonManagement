@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,7 +18,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PrismMasonManagement.Application;
 using PrismMasonManagement.Application.Authorization.Permission;
+using PrismMasonManagement.Application.Contracts;
 using PrismMasonManagement.Application.Contracts.Configuration;
 using PrismMasonManagement.Infrastructure;
 
