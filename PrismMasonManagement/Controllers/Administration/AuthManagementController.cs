@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -99,6 +101,53 @@ namespace PrismMasonManagement.Api.Controllers.Administration
         }
 
         [HttpPost]
+        [Route("SendOTP")]
+        public async Task<IActionResult> SendOTP(string mobileNumber)
+        {
+            var user = await _userManager.Users.Where(x => x.PhoneNumber == mobileNumber).FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+
+                var contentDto = new MobileOTPRequestDto
+                {
+                    Mobile = mobileNumber
+                };
+                var contentString = JsonConvert.SerializeObject(contentDto);
+                var client = new HttpClient();
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri("https://d7-verify.p.rapidapi.com/send"),
+                    Headers =
+                    {
+                        { "authorization", "undefined" },
+                        { "x-rapidapi-host", "d7-verify.p.rapidapi.com" },
+                        { "x-rapidapi-key", "312a7bf118mshe24f32048cb01a0p19624djsn6fb3c3209bdd" },
+                    },
+                    Content = new StringContent(contentString)
+                    {
+                        Headers =
+                        {
+                            ContentType = new MediaTypeHeaderValue("application/json")
+                        }
+                    }
+                };
+
+                using (var response = await client.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var body = await response.Content.ReadAsStringAsync();
+                    return Ok(body);
+                }
+            }
+            else
+            {
+                return Ok("User not present in system");
+            }
+        }
+
+        [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDto user)
         {
@@ -135,6 +184,27 @@ namespace PrismMasonManagement.Api.Controllers.Administration
                 Errors = new List<string> { "Invalid payload" },
                 IsSuccess = false
             });
+        }
+
+        [HttpPost]
+        [Route("LoginWithOTP")]
+        public async Task<IActionResult> LoginWithOTP(string mobileNumber)
+        {
+            var user = await _userManager.Users.Where(x => x.PhoneNumber == mobileNumber).FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                var jwtToken = await GenerateJwtTokenAsync(user);
+
+                return Ok(jwtToken);
+            }
+            else
+            {
+                return Ok("User not present in system");
+            }
+
+
+
         }
 
 
