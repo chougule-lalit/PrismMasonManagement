@@ -234,3 +234,5 @@ _Pvt_Extensions
 .fake/
 Logs/
 *.db
+/PrismMasonManagement/PrismMasonManagement.db-shm
+/PrismMasonManagement/PrismMasonManagement.db-wal
