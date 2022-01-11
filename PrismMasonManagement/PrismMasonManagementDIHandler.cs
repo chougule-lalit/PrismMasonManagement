@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using PrismMasonManagement.Api.Errors;
 using PrismMasonManagement.Application.Administration.Services;
 using PrismMasonManagement.Application.Contracts.Administration.Interfaces;
 using PrismMasonManagement.Application.Contracts.PrismMasonManagementDTOs;
 using PrismMasonManagement.Application.PrismMasonManagementAppServices;
+using PrismMasonManagement.Core.PrismMasonManagementCoreBase.Interface;
 using PrismMasonManagement.Infrastructure.PrismMasonManagementDomainService;
+using PrismMasonManagement.Infrastructure.PrismMasonManagementInfrastructureBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +21,33 @@ namespace PrismMasonManagement.Api
         public static void AddPrismMasonManagementDependencies(this IServiceCollection services)
         {
             services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped(typeof(IRepository<>), (typeof(Repository<>)));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddTransient<IUserRoleAppService, UserRoleAppService>();
             services.AddTransient<IUserAppService, UserAppService>();
             services.AddTransient<IItemAppService, ItemAppService>();
+
+
+            //Configuring Global Exception handler options for ValidationErrors
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var errors = actionContext.ModelState
+                        .Where(x => x.Value.Errors.Count > 0)
+                        .SelectMany(x => x.Value.Errors)
+                        .Select(x => x.ErrorMessage)
+                        .ToArray();
+
+                    var errorResponse = new ApiValidationErrorResponse
+                    {
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(errorResponse);
+                };
+            });
         }
 
         public static void AddAllTypes<T>(this IServiceCollection services

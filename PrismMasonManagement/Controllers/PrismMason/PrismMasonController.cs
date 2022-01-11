@@ -72,9 +72,9 @@ namespace PrismMasonManagement.Api.Controllers.PrismMason
         [HttpDelete]
         [Route("delete")]
         [Authorize(Policy = Permissions.Items.Delete)]
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            await _itemAppService.DeleteAsync(id);
+            return await _itemAppService.DeleteAsync(id);
         }
     }
 }

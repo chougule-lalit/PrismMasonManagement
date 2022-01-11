@@ -9,7 +9,7 @@ namespace PrismMasonManagement.Application.Contracts.PrismMasonManagementDTOs
 {
     public interface IItemAppService : IPrismMasonManagementAppService
     {
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
 
         Task<List<ItemDto>> GetAllItemsAync();
     }

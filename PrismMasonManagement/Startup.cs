@@ -85,26 +85,6 @@ namespace PrismMasonManagement.Api
 
             services.AddControllers();
 
-            //Configuring Global Exception handler options for ValidationErrors
-            services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.InvalidModelStateResponseFactory = actionContext =>
-                {
-                    var errors = actionContext.ModelState
-                        .Where(x => x.Value.Errors.Count > 0)
-                        .SelectMany(x => x.Value.Errors)
-                        .Select(x => x.ErrorMessage)
-                        .ToArray();
-
-                    var errorResponse = new ApiValidationErrorResponse
-                    {
-                        Errors = errors
-                    };
-
-                    return new BadRequestObjectResult(errorResponse);
-                };
-            });
-
             services.AddCors(options =>
             {
                 options.AddPolicy("EnableCORS", builder =>

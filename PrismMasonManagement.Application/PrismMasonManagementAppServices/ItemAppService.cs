@@ -2,6 +2,7 @@
 using PrismMasonManagement.Application.Contracts.PrismMasonManagementDTOs;
 using PrismMasonManagement.Application.Contracts.PrismMasonManagementDTOs.DTO;
 using PrismMasonManagement.Core.Entities;
+using PrismMasonManagement.Core.PrismMasonManagementCoreBase.Interface;
 using PrismMasonManagement.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -13,30 +14,28 @@ namespace PrismMasonManagement.Application.PrismMasonManagementAppServices
 {
     public class ItemAppService : PrismMasonManagementAppService, IItemAppService
     {
-        private readonly PrismMasonManagementDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ItemAppService(
-            PrismMasonManagementDbContext context) 
+        public ItemAppService(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var result = await _context.Items
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (result != null)
-            {
-                _context.Items.Remove(result);
-                await _context.SaveChangesAsync();
-            }
+            _unitOfWork.Repository<Item>().Delete(id);
+            var result = await _unitOfWork.Complete();
+            if (result > 0)
+                return true;
+            else 
+                return false;
         }
 
         public async Task<List<ItemDto>> GetAllItemsAync()
         {
-            var result = await _context.Items.ToListAsync();
-            var returnData = ObjectMapper.Map<List<Item>, List<ItemDto>>(result);
-            return returnData;
+            var query = await _unitOfWork.Repository<Item>().GetAll().ToListAsync();
+            await _unitOfWork.Complete();
+            return ObjectMapper.Map<List<Item>, List<ItemDto>>(query);
         }
     }
 }
