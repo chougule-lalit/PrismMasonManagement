@@ -14,22 +14,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using PrismMasonManagement.Application.Authorization;
+using PrismMasonManagement.Application.Administration;
 using PrismMasonManagement.Application.Contracts.Configuration;
 using PrismMasonManagement.Application.Contracts.DTOs.Permission;
 using PrismMasonManagement.Application.Contracts.DTOs.Requests;
 using PrismMasonManagement.Application.Contracts.DTOs.Responses;
+using PrismMasonManagement.Core;
 using PrismMasonManagement.Core.Entities;
 using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Api.Controllers.Administration
 {
-    [Route("api/[controller]")] //api/authManagement
-    [ApiController]
     [AllowAnonymous]
-    public class AuthManagementController : ControllerBase
+    public class AuthManagementController : PrismMasonManagementBaseApiController
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IOptionsMonitor<JwtConfig> _optionsMonitor;
         private readonly TokenValidationParameters _tokenValidationParameters;
@@ -39,7 +38,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
 
 
         public AuthManagementController(
-            UserManager<IdentityUser> userManager,
+            UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IOptionsMonitor<JwtConfig> optionsMonitor,
             TokenValidationParameters tokenValidationParameters,
@@ -71,7 +70,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
                     });
                 }
 
-                var newUser = new IdentityUser()
+                var newUser = new AppUser()
                 {
                     Email = user.Email,
                     UserName = user.Username
@@ -93,6 +92,45 @@ namespace PrismMasonManagement.Api.Controllers.Administration
                     });
                 }
             }
+            return BadRequest(new RegistrationResponseDto()
+            {
+                Errors = new List<string> { "Invalid payload" },
+                IsSuccess = false
+            });
+        }
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginRequestDto user)
+        {
+            if (ModelState.IsValid)
+            {
+                var exisitingUser = await _userManager.FindByEmailAsync(user.Email);
+                if (exisitingUser == null)
+                {
+                    return BadRequest(new RegistrationResponseDto
+                    {
+                        Errors = new List<string> { "Invalid login request" },
+                        IsSuccess = false
+                    });
+                }
+
+                var isCorrect = await _userManager.CheckPasswordAsync(exisitingUser, user.Password);
+
+                if (!isCorrect)
+                {
+                    return BadRequest(new RegistrationResponseDto
+                    {
+                        Errors = new List<string> { "Invalid login request" },
+                        IsSuccess = false
+                    });
+                }
+
+                var jwtToken = await GenerateJwtTokenAsync(exisitingUser);
+
+                return Ok(jwtToken);
+            }
+
             return BadRequest(new RegistrationResponseDto()
             {
                 Errors = new List<string> { "Invalid payload" },
@@ -145,45 +183,6 @@ namespace PrismMasonManagement.Api.Controllers.Administration
             {
                 return Ok("User not present in system");
             }
-        }
-
-        [HttpPost]
-        [Route("Login")]
-        public async Task<IActionResult> Login([FromBody] UserLoginRequestDto user)
-        {
-            if (ModelState.IsValid)
-            {
-                var exisitingUser = await _userManager.FindByEmailAsync(user.Email);
-                if (exisitingUser == null)
-                {
-                    return BadRequest(new RegistrationResponseDto
-                    {
-                        Errors = new List<string> { "Invalid login request" },
-                        IsSuccess = false
-                    });
-                }
-
-                var isCorrect = await _userManager.CheckPasswordAsync(exisitingUser, user.Password);
-
-                if (!isCorrect)
-                {
-                    return BadRequest(new RegistrationResponseDto
-                    {
-                        Errors = new List<string> { "Invalid login request" },
-                        IsSuccess = false
-                    });
-                }
-
-                var jwtToken = await GenerateJwtTokenAsync(exisitingUser);
-
-                return Ok(jwtToken);
-            }
-
-            return BadRequest(new RegistrationResponseDto()
-            {
-                Errors = new List<string> { "Invalid payload" },
-                IsSuccess = false
-            });
         }
 
         [HttpPost]
@@ -336,7 +335,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
 
         #region  JWT TOKEN  
 
-        private async Task<List<Claim>> GetValidClaimsAsync(IdentityUser user)
+        private async Task<List<Claim>> GetValidClaimsAsync(AppUser user)
         {
             IdentityOptions _options = new IdentityOptions();
             var claims = new List<Claim>
@@ -355,7 +354,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
             return claims;
         }
 
-        private async Task<AuthResult> GenerateJwtTokenAsync(IdentityUser user)
+        private async Task<AuthResult> GenerateJwtTokenAsync(AppUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);

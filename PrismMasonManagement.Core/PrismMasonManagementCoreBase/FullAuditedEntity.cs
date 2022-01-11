@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PrismMasonManagement.Core.PrismMasonManagementCoreBase
 {
-    public abstract class FullAuditedEntity<TKey> : Entity<TKey>
+    abstract class FullAuditedEntity<TKey> : Entity<TKey>
     {
         public virtual DateTime? LastModificationTime { get; set; }
         public virtual Guid? LastModifierId { get; set; }

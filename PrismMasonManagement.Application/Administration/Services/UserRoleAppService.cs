@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PrismMasonManagement.Application.Contracts.Authorization.Interfaces;
+using PrismMasonManagement.Application.Administration.Seeding;
+using PrismMasonManagement.Application.Contracts.Administration.Interfaces;
 using PrismMasonManagement.Application.Contracts.DTOs.Permission;
-using PrismMasonManagement.Application.Seeding;
+using PrismMasonManagement.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Application.Authorization.Services
+namespace PrismMasonManagement.Application.Administration.Services
 {
     public class UserRoleAppService : IUserRoleAppService
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public UserRoleAppService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager)
+        public UserRoleAppService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -66,7 +67,7 @@ namespace PrismMasonManagement.Application.Authorization.Services
             if (!result.Succeeded)
                 return false;
 
-            await _signInManager.RefreshSignInAsync(user);
+            //await _signInManager.RefreshSignInAsync(user);
             await PrismMasonUserSeeder.SeedSuperAdminAsync(_userManager, _roleManager);
             return true;
         }

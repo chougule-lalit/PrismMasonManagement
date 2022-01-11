@@ -1,19 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PrismMasonManagement.Application.Contracts.Authorization.Interfaces;
 using PrismMasonManagement.Application.Contracts.DTOs.Permission;
-using PrismMasonManagement.Application.Seeding;
+using PrismMasonManagement.Application.Administration.Seeding;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PrismMasonManagement.Application.Contracts.Administration.Interfaces;
 
 namespace PrismMasonManagement.Api.Controllers.Administration
 {
-    [Route("api/[controller]")]
-    [ApiController]
     //[Authorize(Roles = "SuperAdmin")]
-    public class UserRolesController : ControllerBase
+    public class UserRolesController : PrismMasonManagementBaseApiController
     {
         private readonly IUserRoleAppService _userRoleAppService;
 

@@ -23,9 +23,16 @@ namespace PrismMasonManagement.Infrastructure.PrismMasonManagementDomainService
             try
             {
                 Guid userId = Guid.Empty;
-                var data = _httpContextAccessor.HttpContext.User.Claims.Where(x => x.Type == "Id").Select(x => x.Value).FirstOrDefault();
-                Guid.TryParse(data, out userId);
+                if (_httpContextAccessor != null)
+                {
+                    if (_httpContextAccessor.HttpContext != null)
+                    {
+                        var data = _httpContextAccessor.HttpContext.User.Claims.Where(x => x.Type == "Id").Select(x => x.Value).FirstOrDefault();
+                        Guid.TryParse(data, out userId);
+                    }
+                }
                 return userId;
+
             }
             catch (Exception ex)
             {

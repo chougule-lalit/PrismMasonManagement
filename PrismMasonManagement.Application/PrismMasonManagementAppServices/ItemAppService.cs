@@ -15,17 +15,14 @@ namespace PrismMasonManagement.Application.PrismMasonManagementAppServices
     {
         private readonly PrismMasonManagementDbContext _context;
 
-        public ItemAppService(IServiceProvider serviceProvider,
+        public ItemAppService(
             PrismMasonManagementDbContext context) 
-            : base(serviceProvider)
         {
             _context = context;
         }
 
         public async Task DeleteAsync(int id)
         {
-            Console.WriteLine($"CurrentUserId : {CurrentUser.Id}");
-
             var result = await _context.Items
                 .FirstOrDefaultAsync(e => e.Id == id);
             if (result != null)

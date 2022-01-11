@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PrismMasonManagement.Application.Authorization;
+using PrismMasonManagement.Core;
 using PrismMasonManagement.Core.Constants;
 using System;
 using System.Collections.Generic;
@@ -7,13 +8,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Application.Seeding
+namespace PrismMasonManagement.Application.Administration.Seeding
 {
     public static class PrismMasonUserSeeder
     {
-        public static async Task SeedBasicUserAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedBasicUserAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            var defaultUser = new IdentityUser
+            var defaultUser = new AppUser
             {
                 UserName = "basicuser@gmail.com",
                 Email = "basicuser@gmail.com",
@@ -29,9 +30,9 @@ namespace PrismMasonManagement.Application.Seeding
                 }
             }
         }
-        public static async Task SeedSuperAdminAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedSuperAdminAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            var defaultUser = new IdentityUser
+            var defaultUser = new AppUser
             {
                 UserName = "superadmin@gmail.com",
                 Email = "superadmin@gmail.com",

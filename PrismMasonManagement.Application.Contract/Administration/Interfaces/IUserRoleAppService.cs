@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PrismMasonManagement.Application.Contracts.Authorization.Interfaces
+namespace PrismMasonManagement.Application.Contracts.Administration.Interfaces
 {
     public interface IUserRoleAppService
     {

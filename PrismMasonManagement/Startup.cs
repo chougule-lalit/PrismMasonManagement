@@ -18,10 +18,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PrismMasonManagement.Api.Errors;
+using PrismMasonManagement.Api.PrismMasonManagementMiddleware;
 using PrismMasonManagement.Application;
 using PrismMasonManagement.Application.Authorization.Permission;
 using PrismMasonManagement.Application.Contracts;
 using PrismMasonManagement.Application.Contracts.Configuration;
+using PrismMasonManagement.Core;
 using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Api
@@ -76,14 +79,31 @@ namespace PrismMasonManagement.Api
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
-            ////Automappers
-            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
                         .AddRoles<IdentityRole>()
                         .AddEntityFrameworkStores<PrismMasonManagementDbContext>();
 
             services.AddControllers();
+
+            //Configuring Global Exception handler options for ValidationErrors
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var errors = actionContext.ModelState
+                        .Where(x => x.Value.Errors.Count > 0)
+                        .SelectMany(x => x.Value.Errors)
+                        .Select(x => x.ErrorMessage)
+                        .ToArray();
+
+                    var errorResponse = new ApiValidationErrorResponse
+                    {
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(errorResponse);
+                };
+            });
 
             services.AddCors(options =>
             {
@@ -124,10 +144,9 @@ namespace PrismMasonManagement.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

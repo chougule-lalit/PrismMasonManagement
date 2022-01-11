@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using PrismMasonManagement.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace PrismMasonManagement.Application.Authorization.Permission
 {
     public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public PermissionAuthorizationHandler(
-            UserManager<IdentityUser> userManager,
+            UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager
             )
         {

@@ -10,10 +10,8 @@ using PrismMasonManagement.Infrastructure;
 
 namespace PrismMasonManagement.Api.Controllers.PrismMason
 {
-    [Route("api/[controller]")]
-    [ApiController]
     [Authorize]
-    public class PrismMasonController : ControllerBase
+    public class PrismMasonController : PrismMasonManagementBaseApiController
     {
         private readonly PrismMasonManagementDbContext _context;
         private readonly IItemAppService _itemAppService;

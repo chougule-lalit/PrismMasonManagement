@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using PrismMasonManagement.Application.Contracts;
 using PrismMasonManagement.Infrastructure.PrismMasonManagementDomainService;
 using System;
@@ -11,15 +12,12 @@ namespace PrismMasonManagement.Application
 {
     public abstract class PrismMasonManagementAppService : IPrismMasonManagementAppService, ITransientDependency
     {
-        private readonly IServiceProvider _serviceProvider;
         private IMapper _mapper;
 
-        protected PrismMasonManagementAppService(IServiceProvider serviceProvider)
+        protected PrismMasonManagementAppService(
+            )
         {
-            _serviceProvider = serviceProvider;
         }
-
-        protected ICurrentUser CurrentUser => (ICurrentUser)_serviceProvider.GetService(typeof(ICurrentUser));
 
         protected IMapper ObjectMapper => ObjectMapperRegistration(out _mapper);
 

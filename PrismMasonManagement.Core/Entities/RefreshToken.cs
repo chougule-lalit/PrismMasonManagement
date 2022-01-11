@@ -23,6 +23,6 @@ namespace PrismMasonManagement.Core.Entities
         public DateTime ExpiryDate { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public IdentityUser User {get;set;}
+        public AppUser User {get;set;}
     }
 }

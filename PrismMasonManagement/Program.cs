@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PrismMasonManagement.Application.Seeding;
+using PrismMasonManagement.Application.Administration.Seeding;
+using PrismMasonManagement.Core;
 using Serilog;
 
 namespace PrismMasonManagement.Api
@@ -26,7 +27,7 @@ namespace PrismMasonManagement.Api
                 using (var scope = host.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;
-                    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                    var userManager = services.GetRequiredService<UserManager<AppUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                     await PrismMasonRoleSeeder.SeedAsync(userManager, roleManager);
                     await PrismMasonUserSeeder.SeedBasicUserAsync(userManager, roleManager);

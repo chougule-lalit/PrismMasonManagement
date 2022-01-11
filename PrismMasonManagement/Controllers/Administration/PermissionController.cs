@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace PrismMasonManagement.Api.Controllers.Administration
 {
-    [Route("api/[controller]")]
-    [ApiController]
     //[Authorize(Roles = "SuperAdmin")]
-    public class PermissionController : ControllerBase
+    public class PermissionController : PrismMasonManagementBaseApiController
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         public PermissionController(RoleManager<IdentityRole> roleManager)
