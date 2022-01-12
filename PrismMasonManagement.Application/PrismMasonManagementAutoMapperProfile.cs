@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using PrismMasonManagement.Application.Contracts.Administration.DTOs;
 using PrismMasonManagement.Application.Contracts.PrismMasonManagementDTOs.DTO;
 using PrismMasonManagement.Core;
@@ -29,6 +30,12 @@ namespace PrismMasonManagement.Application
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ReverseMap()
+                .ForAllOtherMembers(opt => opt.Ignore());
+
+            CreateMap<IdentityRole, RoleDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ReverseMap()
                 .ForAllOtherMembers(opt => opt.Ignore());
 

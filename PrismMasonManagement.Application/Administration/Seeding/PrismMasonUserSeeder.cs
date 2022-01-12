@@ -55,19 +55,19 @@ namespace PrismMasonManagement.Application.Administration.Seeding
         {
             var adminRole = await roleManager.FindByNameAsync("SuperAdmin");
             await roleManager.AddPermissionClaim(adminRole, "Items");
+            await roleManager.AddPermissionClaim(adminRole, "Users");
+            await roleManager.AddPermissionClaim(adminRole, "Roles");
         }
         public static async Task AddPermissionClaim(this RoleManager<IdentityRole> roleManager, IdentityRole role, string module)
         {
             var allClaims = await roleManager.GetClaimsAsync(role);
-            if (allClaims.Count == 0)
+
+            var allPermissions = Permissions.GeneratePermissionsForModule(module);
+            foreach (var permission in allPermissions)
             {
-                var allPermissions = Permissions.GeneratePermissionsForModule(module);
-                foreach (var permission in allPermissions)
+                if (!allClaims.Any(a => a.Type == "Permission" && a.Value == permission))
                 {
-                    if (!allClaims.Any(a => a.Type == "Permission" && a.Value == permission))
-                    {
-                        await roleManager.AddClaimAsync(role, new Claim("Permission", permission));
-                    }
+                    await roleManager.AddClaimAsync(role, new Claim("Permission", permission));
                 }
             }
         }

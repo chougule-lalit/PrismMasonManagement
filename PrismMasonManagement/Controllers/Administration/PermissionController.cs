@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PrismMasonManagement.Application.Authorization;
 using PrismMasonManagement.Application.Contracts.DTOs.Permission;
@@ -20,11 +21,12 @@ namespace PrismMasonManagement.Api.Controllers.Administration
 
         [HttpGet]
         [Route("GetPermissionForRole/{roleId}")]
+        [Authorize(Policy = Permissions.Roles.PermissionChange)]
         public async Task<IActionResult> GetPermissionForRoleAsync(string roleId)
         {
             var model = new PermissionDto();
             var allPermissions = new List<RoleClaimsDto>();
-            allPermissions.GetPermissions(Permissions.GetAllPermissionTypes(), roleId);
+            allPermissions.GetPermissions(typeof(Permissions), roleId);
             var role = await _roleManager.FindByIdAsync(roleId);
             model.RoleId = roleId;
             var claims = await _roleManager.GetClaimsAsync(role);
@@ -35,7 +37,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
             {
                 if (authorizedClaims.Any(a => a == permission.Value))
                 {
-                    permission.Selected = true;
+                    permission.IsGranted = true;
                 }
             }
             model.RoleClaims = allPermissions;
@@ -44,6 +46,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
 
         [HttpPost]
         [Route("Update")]
+        [Authorize(Policy = Permissions.Roles.PermissionChange)]
         public async Task<IActionResult> Update(PermissionDto model)
         {
             var role = await _roleManager.FindByIdAsync(model.RoleId);
@@ -52,7 +55,7 @@ namespace PrismMasonManagement.Api.Controllers.Administration
             {
                 await _roleManager.RemoveClaimAsync(role, claim);
             }
-            var selectedClaims = model.RoleClaims.Where(a => a.Selected).ToList();
+            var selectedClaims = model.RoleClaims.Where(a => a.IsGranted).ToList();
             foreach (var claim in selectedClaims)
             {
                 await _roleManager.AddPermissionClaim(role, claim.Value);

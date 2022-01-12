@@ -2,6 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PrismMasonManagement.Application.Authorization;
+using PrismMasonManagement.Application.Contracts.Administration.DTOs;
+using PrismMasonManagement.Application.Contracts.Administration.Interfaces;
+using PrismMasonManagement.Application.Contracts.PrismMasonManagementDTOs.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,32 +14,53 @@ using System.Threading.Tasks;
 namespace PrismMasonManagement.Api.Controllers.Administration
 {
     //[Authorize(Roles = "SuperAdmin")]
-    public class RolesController : PrismMasonManagementBaseApiController
+    public class RolesController : PrismMasonManagementBaseApiController, IRoleAppService
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IRoleAppService _roleAppService;
 
-        public RolesController(RoleManager<IdentityRole> roleManager)
+        public RolesController(IRoleAppService roleAppService)
         {
-            _roleManager = roleManager;
-        }
-
-        [HttpGet]
-        [Route("GetAllList")]
-        public async Task<IActionResult> GetListAsync()
-        {
-            var roles = await _roleManager.Roles.ToListAsync();
-            return Ok(roles);
+            _roleAppService = roleAppService;
         }
 
         [HttpPost]
-        [Route("Create")]
-        public async Task<IActionResult> CreateRole(string roleName)
+        [Route("create")]
+        [Authorize(Policy = Permissions.Roles.Create)]
+        public virtual async Task<bool> CreateAsync(string roleName)
         {
-            if (roleName != null)
-            {
-                await _roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
-            }
-            return Ok(true);
+            return await _roleAppService.CreateAsync(roleName);
+        }
+
+        [HttpDelete]
+        [Route("delete")]
+        [Authorize(Policy = Permissions.Roles.Delete)]
+        public virtual async Task<bool> DeleteAsync(Guid id)
+        {
+            return await _roleAppService.DeleteAsync(id);
+        }
+
+        [HttpGet]
+        [Route("get")]
+        [Authorize(Policy = Permissions.Roles.View)]
+        public virtual async Task<RoleDto> GetAsync(Guid id)
+        {
+            return await _roleAppService.GetAsync(id);
+        }
+
+        [HttpPost]
+        [Route("pagedResult")]
+        [Authorize(Policy = Permissions.Roles.View)]
+        public virtual async Task<PagedResultDto<RoleDto>> PagedResultAsync(GetRoleInputDto input)
+        {
+            return await _roleAppService.PagedResultAsync(input);
+        }
+
+        [HttpPost]
+        [Route("update")]
+        [Authorize(Policy = Permissions.Roles.Edit)]
+        public virtual async Task<bool> UpdateAsync(RoleDto input)
+        {
+            return await _roleAppService.UpdateAsync(input);
         }
     }
 }

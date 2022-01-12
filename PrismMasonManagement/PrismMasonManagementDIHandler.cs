@@ -26,6 +26,7 @@ namespace PrismMasonManagement.Api
 
             services.AddTransient<IUserRoleAppService, UserRoleAppService>();
             services.AddTransient<IUserAppService, UserAppService>();
+            services.AddTransient<IRoleAppService, RoleAppService>();
             services.AddTransient<IItemAppService, ItemAppService>();
 
 
